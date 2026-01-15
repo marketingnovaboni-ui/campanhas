@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Supplier {
+  id        Int     @id @default(autoincrement())
+  code      String  @unique
+  name      String
+  group     String
+  diaD      DiaDReservation[]
+  pix       PixReservation[]
+  bimester  BimesterParticipation[]
+  monthly   MonthlyCampaign[]
+  oneOff    OneOffAction[]
+  createdAt DateTime @default(now())
+}
+
+model DiaDReservation {
+  id         Int      @id @default(autoincrement())
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  supplierId Int
+  date       DateTime @unique
+  type       String
+  note       String?
+  invest     Decimal?
+  createdAt  DateTime @default(now())
+}
+
+model PixReservation {
+  id         Int      @id @default(autoincrement())
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  supplierId Int
+  weekStart  DateTime
+  weekEnd    DateTime
+  theme      String?
+  note       String?
+  invest     Decimal?
+  createdAt  DateTime @default(now())
+
+  @@unique([supplierId, weekStart])
+  @@index([weekStart])
+}
+
+model BimesterParticipation {
+  id          Int      @id @default(autoincrement())
+  supplier    Supplier @relation(fields: [supplierId], references: [id])
+  supplierId  Int
+  bimesterKey String
+  participates Boolean @default(false)
+  invest      Decimal?
+  createdAt   DateTime @default(now())
+
+  @@unique([supplierId, bimesterKey])
+}
+
+model MonthlyCampaign {
+  id         Int      @id @default(autoincrement())
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  supplierId Int
+  monthKey   String
+  action     String
+  detail     String?
+  invest     Decimal?
+  createdAt  DateTime @default(now())
+}
+
+model OneOffAction {
+  id         Int      @id @default(autoincrement())
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  supplierId Int
+  date       DateTime
+  action     String
+  detail     String?
+  invest     Decimal?
+  createdAt  DateTime @default(now())
+}
+
+model HolidayMunicipal {
+  id    Int      @id @default(autoincrement())
+  date  DateTime @unique
+  name  String
+}
