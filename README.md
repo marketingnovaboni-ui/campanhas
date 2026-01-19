@@ -19,6 +19,11 @@ Crie um arquivo `.env` com a conexão:
 DATABASE_URL="postgresql://planner:planner@localhost:5432/planner?schema=public"
 ```
 
+Se o endpoint `/api/suppliers` retornar erro 500, confira:
+- o Docker está rodando (`docker compose ps`)
+- o arquivo `.env` existe
+- o seed foi executado (`npm run seed`)
+
 Instale dependências e rode migrations:
 
 ```bash
