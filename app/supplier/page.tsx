@@ -70,9 +70,18 @@ export default function SupplierPage() {
 
   useEffect(() => {
     const loadSuppliers = async () => {
-      const response = await fetch(`/api/suppliers?query=${encodeURIComponent(query)}`);
-      const data = await response.json();
-      setSuppliers(data);
+      try {
+        const response = await fetch(`/api/suppliers?query=${encodeURIComponent(query)}`);
+        if (!response.ok) {
+          setMessage("Não foi possível carregar fornecedores.");
+          return;
+        }
+        const text = await response.text();
+        const data = text ? (JSON.parse(text) as Supplier[]) : [];
+        setSuppliers(data);
+      } catch (error) {
+        setMessage("Falha ao conectar com o servidor.");
+      }
     };
     loadSuppliers();
   }, [query]);
