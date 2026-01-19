@@ -2,22 +2,31 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const query = searchParams.get("query")?.trim();
+  try {
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.get("query")?.trim();
 
-  const suppliers = await prisma.supplier.findMany({
-    where: query
-      ? {
-          OR: [
-            { name: { contains: query, mode: "insensitive" } },
-            { code: { contains: query, mode: "insensitive" } }
-          ]
-        }
-      : undefined,
-    orderBy: { name: "asc" }
-  });
+    const suppliers = await prisma.supplier.findMany({
+      where: query
+        ? {
+            OR: [
+              { name: { contains: query, mode: "insensitive" } },
+              { code: { contains: query, mode: "insensitive" } }
+            ]
+          }
+        : undefined,
+      orderBy: { name: "asc" }
+    });
 
-  return NextResponse.json(suppliers);
+    return NextResponse.json(suppliers);
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "Não foi possível carregar fornecedores. Confira se o banco está ligado e se o seed foi executado."
+      },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {

@@ -73,7 +73,13 @@ export default function SupplierPage() {
       try {
         const response = await fetch(`/api/suppliers?query=${encodeURIComponent(query)}`);
         if (!response.ok) {
-          setMessage("Não foi possível carregar fornecedores.");
+          const text = await response.text();
+          try {
+            const errorMessage = text ? JSON.parse(text).error : "Não foi possível carregar fornecedores.";
+            setMessage(errorMessage);
+          } catch (parseError) {
+            setMessage("Não foi possível carregar fornecedores.");
+          }
           return;
         }
         const text = await response.text();
